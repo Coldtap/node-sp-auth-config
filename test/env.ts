@@ -14,9 +14,10 @@ process.env['SPAUTH_FORCE'] = 'true';
 const authConfig = new AuthConfig({
   configPath: path.join(__dirname, '../config/private-fake.json'),
   defaultConfigPath: path.join(__dirname, '../config/default-fake.json'),
-  saveConfigOnDisk: false
+  saveConfigOnDisk: false,
 });
 
-authConfig.getContext()
+authConfig
+  .getContext()
   .then((context) => console.log(JSON.stringify(context, null, 2)))
   .catch(console.warn);

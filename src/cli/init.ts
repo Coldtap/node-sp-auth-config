@@ -5,7 +5,6 @@ import { AuthConfig } from '../index';
 import { ICliInitParameters } from '../interfaces';
 
 export const init = (options: ICliInitParameters): Promise<void> => {
-
   if (typeof options.path === 'undefined') {
     console.log(
       colors.red(`'${colors.bold('-p, --path')}' parameter should be provided`),
@@ -26,15 +25,15 @@ export const init = (options: ICliInitParameters): Promise<void> => {
     encryptPassword: options.encrypt,
     saveConfigOnDisk: true,
     forcePrompts: true,
-    masterKey: options.masterkey
+    masterKey: options.masterkey,
   });
 
-  return authConfig.getContext()
+  return authConfig
+    .getContext()
     .then(() => {
       console.log(`\n${colors.green('File saved to')} ${colors.cyan(path.resolve(options.path))}`);
     })
     .catch((error) => {
       console.log('Error:', error);
     });
-
 };

@@ -7,7 +7,7 @@ const authConfig = new AuthConfig({
   authOptions: {
     siteUrl: 'https://contoso.sharepoint.com/sites/site',
     strategy: 'UserCredentials', // 'OnlineAddinCredentials'
-    username: 'service.account_contoso.onmicrosoft.com' // incorrect password to appear in prompts
+    username: 'service.account_contoso.onmicrosoft.com', // incorrect password to appear in prompts
   } as any,
   hooks: {
     shouldSkipQuestionPrompt: (promptCtx): boolean => {
@@ -31,10 +31,11 @@ const authConfig = new AuthConfig({
         return true;
       }
       return false; // do not skip anything else
-    }
-  }
+    },
+  },
 });
 
-authConfig.getContext()
+authConfig
+  .getContext()
   .then((context) => console.log(JSON.stringify(context, null, 2)))
   .catch(console.warn);

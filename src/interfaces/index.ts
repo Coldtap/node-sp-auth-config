@@ -2,7 +2,7 @@
 import { IAuthOptions } from 'node-sp-auth';
 // Auth interfaces
 
-import { IHooks } from './wizard';
+// import { IHooks } from './wizard';
 
 export type StrategyCode =
   | 'OnPremiseAddinCredentials'
@@ -46,7 +46,7 @@ export interface IAuthConfigSettings {
   forcePrompts?: boolean;
   masterKey?: string;
   headlessMode?: boolean;
-  hooks?: IHooks;
+  //hooks?: IHooks;
 }
 
 export interface ICheckPromptsResponse {
@@ -64,4 +64,4 @@ export interface ICliInitParameters {
 }
 
 // tslint:disable-next-line: no-empty-interface
-export type ICliReadParameters = ICliInitParameters
+export type ICliReadParameters = ICliInitParameters;

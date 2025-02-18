@@ -16,7 +16,7 @@ const authPropsMapping = {
   fba: 'fba',
   tmg: 'tmg',
   domain: 'domain',
-  online: 'online'
+  online: 'online',
 };
 
 export interface IAuthEnvProps {
@@ -36,7 +36,9 @@ export const getConfigFromEnvVariables = (): IAuthEnvProps | null => {
       if (authProp === 'custom') {
         try {
           (res as any).custom = JSON.parse(process.env[key]);
-        } catch (ex) { /**/ }
+        } catch (ex) {
+          /**/
+        }
       }
       return res;
     }, {});

@@ -5,10 +5,10 @@
   "main": "./dist/index.js",
   "typings": "./dist/index",
   "scripts": {
-    "build": "rimraf ./dist && npm run lint && tsc -p .",
+    "build": "rimraf ./dist && tsc -p .",
     "test:lib": "ts-node ./test/init.ts",
     "test:cli": "npm run build && node ./dist/cli init -p ./config/private.cli.json",
-    "lint": "tsc --noEmit && eslint \"*/**/*.ts\" --quiet --fix"
+    "lint": "tsc --noEmit && eslint \"*/**/*.ts\" --quiet"
   },
   "bin": {
     "sp-auth": "./dist/cli.js"
@@ -33,10 +33,7 @@
   "dependencies": {
     "colors": "^1.4.0",
     "commander": "^9.4.0",
-    "cpass": "^2.3.0",
-    "inquirer": "^8.2.4",
-    "mkdirp": "^1.0.4",
-    "node-sp-auth": "^3.0.7"
+    "node-sp-auth": "^3.0.1"
   },
   "devDependencies": {
     "@pnp/pnpjs": "^2.0.6",

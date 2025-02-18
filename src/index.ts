@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Cpass } from 'cpass';
+//import { Cpass } from 'cpass';
 import { getAuth, IAuthOptions, IAuthResponse } from 'node-sp-auth';
 
 // Utils
@@ -8,38 +8,41 @@ import { convertSettingsToAuthContext, saveConfigOnDisk, getHiddenPropertyName }
 import { getConfigFromEnvVariables } from './utils/env';
 
 // Step wizards
-import siteUrlWizard from './wizards/siteUrl';
-import strategyWizard from './wizards/chooseStrategy';
-import credentialsWizard from './wizards/askCredentials';
-import saveOnDiskWizard from './wizards/saveOnDisk';
+// import siteUrlWizard from './wizards/siteUrl';
+// import strategyWizard from './wizards/chooseStrategy';
+// import credentialsWizard from './wizards/askCredentials';
+// import saveOnDiskWizard from './wizards/saveOnDisk';
 
 import { getStrategies } from './config'; // getTargetsTypes
 
 import {
-  IAuthContext, IAuthContextSettings, IStrategyDictItem,
-  IAuthConfigSettings, ICheckPromptsResponse
+  IAuthContext,
+  IAuthContextSettings,
+  IStrategyDictItem,
+  IAuthConfigSettings,
+  ICheckPromptsResponse,
 } from './interfaces';
 
 export class AuthConfig {
-
   private settings: IAuthConfigSettings;
   // private targets: string[];
   private strategies: IStrategyDictItem[];
   private context: IAuthContextSettings;
-  private customData: { [key: string]: string; };
-  private cpass: Cpass;
+  private customData: { [key: string]: string };
+  //private cpass: Cpass;
 
-  constructor (settings: IAuthConfigSettings = {}) {
+  constructor(settings: IAuthConfigSettings = {}) {
     this.strategies = getStrategies();
     // this.targets = getTargetsTypes();
     const envMode = process.env.SPAUTH_ENV || process.env.NODE_ENV;
-    const headlessMode = typeof settings.headlessMode !== 'undefined' ? settings.headlessMode : envMode === 'production';
+    const headlessMode =
+      typeof settings.headlessMode !== 'undefined' ? settings.headlessMode : envMode === 'production';
     this.settings = {
       ...settings,
       configPath: path.resolve(settings.configPath || './config/private.json'),
       encryptPassword: typeof settings.encryptPassword !== 'undefined' ? settings.encryptPassword : true,
       saveConfigOnDisk: typeof settings.saveConfigOnDisk !== 'undefined' ? settings.saveConfigOnDisk : true,
-      headlessMode
+      headlessMode,
     };
     if (typeof this.settings.encryptPassword === 'string') {
       this.settings.encryptPassword = !((this.settings.encryptPassword as string).toLowerCase() === 'false');
@@ -48,7 +51,7 @@ export class AuthConfig {
     if (process.env.AUTH_MASTER_KEY && !this.settings.masterKey) {
       this.settings.masterKey = process.env.AUTH_MASTER_KEY;
     }
-    this.cpass = new Cpass(this.settings.masterKey);
+    //this.cpass = new Cpass(this.settings.masterKey);
   }
 
   public getContext = async (): Promise<IAuthContext> => {
@@ -56,7 +59,7 @@ export class AuthConfig {
     const checkPromptsResponse = await this.checkForPrompts();
     const authContext: IAuthContext = {
       ...checkPromptsResponse.authContext,
-      settings: this.settings
+      settings: this.settings,
     };
 
     /* === From settings === */
@@ -67,34 +70,35 @@ export class AuthConfig {
       return authContext;
     }
 
-    /* === Run Wizard === */
-    // Step 1: Require SharePoint URL
-    let answersResult = await siteUrlWizard(authContext, this.settings, {});
-    // Step 2: SharePoint Online/OnPremise autodetection
-    answersResult = await strategyWizard(authContext, this.settings, answersResult);
-    // Step 3: Ask for strategy specific parameters
-    answersResult = await credentialsWizard(authContext, this.settings, answersResult);
-    // Step 4: Save on disk
-    if (typeof this.customData !== 'undefined') {
-      answersResult.custom = this.customData;
-    }
-    answersResult = await saveOnDiskWizard(authContext, this.settings, answersResult);
-    return convertSettingsToAuthContext(answersResult as any, this.settings);
-  }
+    // /* === Run Wizard === */
+    // // Step 1: Require SharePoint URL
+    // let answersResult = await siteUrlWizard(authContext, this.settings, {});
+    // // Step 2: SharePoint Online/OnPremise autodetection
+    // answersResult = await strategyWizard(authContext, this.settings, answersResult);
+    // // Step 3: Ask for strategy specific parameters
+    // answersResult = await credentialsWizard(authContext, this.settings, answersResult);
+    // // Step 4: Save on disk
+    // if (typeof this.customData !== 'undefined') {
+    //   answersResult.custom = this.customData;
+    // }
+    // answersResult = await saveOnDiskWizard(authContext, this.settings, answersResult);
+    // return convertSettingsToAuthContext(answersResult as any, this.settings);
+    return convertSettingsToAuthContext({} as any, this.settings);
+  };
 
   private tryAuth = (authContext: IAuthContext): Promise<IAuthResponse> => {
     return getAuth(authContext.siteUrl, authContext.authOptions) as any;
-  }
+  };
 
   private checkForPrompts = async (): Promise<ICheckPromptsResponse> => {
     const checkPromptsObject: ICheckPromptsResponse = {
       needPrompts: true,
-      needSave: false
+      needSave: false,
     };
     const checkPrompts = await this.runCheckForPrompts(checkPromptsObject);
     const needPrompts = this.settings.headlessMode ? false : checkPrompts.needPrompts;
     return { ...checkPrompts, needPrompts };
-  }
+  };
 
   private runCheckForPrompts = async (checkObject: ICheckPromptsResponse): Promise<ICheckPromptsResponse> => {
     const checkObj = { ...checkObject };
@@ -105,7 +109,7 @@ export class AuthConfig {
     if (typeof this.settings.defaultConfigPath !== 'undefined') {
       checkObj.jsonRawData = {
         ...this.getJsonContent(this.settings.defaultConfigPath).jsonRawData,
-        ...checkObj.jsonRawData
+        ...checkObj.jsonRawData,
       };
     }
 
@@ -116,10 +120,10 @@ export class AuthConfig {
         checkObj.jsonRawData = {
           ...props,
           custom: {
-            ...custom || {},
-            ...mainCustom || {}
+            ...(custom || {}),
+            ...(mainCustom || {}),
           },
-          ...mainProps
+          ...mainProps,
         };
       };
       if (process.env.SPAUTH_FORCE === 'true') {
@@ -141,9 +145,8 @@ export class AuthConfig {
 
     const passwordPropertyName = getHiddenPropertyName(this.context);
 
-    const withPassword = strategies.length === 1
-      ? strategies[0].withPassword
-      : typeof this.context[passwordPropertyName] !== 'undefined';
+    const withPassword =
+      strategies.length === 1 ? strategies[0].withPassword : typeof this.context[passwordPropertyName] !== 'undefined';
 
     // Strategies with password
     if (withPassword) {
@@ -151,7 +154,7 @@ export class AuthConfig {
       if (!this.context[passwordPropertyName]) {
         checkObj.needPrompts = true;
       } else {
-        this.context[passwordPropertyName] = this.cpass.decode(this.context[passwordPropertyName]);
+        //this.context[passwordPropertyName] = this.cpass.decode(this.context[passwordPropertyName]);
         const decodedPassword = this.context[passwordPropertyName];
         if (initialPassword === decodedPassword && this.settings.encryptPassword && this.settings.saveConfigOnDisk) {
           checkObj.needSave = true;
@@ -186,7 +189,7 @@ export class AuthConfig {
         return checkObj;
       }
     }
-  }
+  };
 
   private getJsonContent = (filePath: string, jsonData?: IAuthOptions): { exists: boolean; jsonRawData: any } => {
     if (typeof jsonData === 'undefined') {
@@ -197,7 +200,9 @@ export class AuthConfig {
           const rawContent = fs.readFileSync(path.resolve(filePath)).toString();
           jsonRawData = JSON.parse(rawContent);
           // jsonRawData = require(filePath);
-        } catch (ex) { /**/ }
+        } catch (ex) {
+          /**/
+        }
       }
       if (typeof jsonRawData.custom !== 'undefined') {
         this.customData = jsonRawData.custom;
@@ -207,8 +212,7 @@ export class AuthConfig {
     } else {
       return { exists: true, jsonRawData: jsonData };
     }
-  }
-
+  };
 }
 
 export { IAuthContext, IAuthConfigSettings } from './interfaces';
