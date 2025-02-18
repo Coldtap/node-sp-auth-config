@@ -33,7 +33,7 @@
   "dependencies": {
     "colors": "^1.4.0",
     "commander": "^9.4.0",
-    "node-sp-auth": "^3.0.1"
+    "node-sp-auth": "git+https://github.com/Coldtap/node-sp-auth#feature/rn-build"
   },
   "devDependencies": {
     "@pnp/pnpjs": "^2.0.6",
